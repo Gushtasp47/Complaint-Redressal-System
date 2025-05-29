@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+  <h2>Welcome, Admin!</h2>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mt-4 mb-3">
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#tabComplaints">📋 All Complaints</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#tabUsers">🧑‍💼 Manage Users</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#tabSettings">⚙️ Settings</a>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <!-- Complaints Tab -->
+    <div class="tab-pane fade show active" id="tabComplaints">
+      <table class="table table-bordered">
+        <thead>
+          <tr><th>ID</th><th>User</th><th>Title</th><th>Dept</th><th>Priority</th><th>Status</th><th>Action</th></th></tr>
+        </thead>
+        <tbody id="adminComplaintsBody">
+          <!-- AJAX will load this -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Users Tab -->
+    <div class="tab-pane fade" id="tabUsers">
+      <table class="table table-striped">
+        <thead>
+          <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="adminUsersBody">
+          <!-- AJAX will load this -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-pane fade" id="tabSettings">
+      <div class="d-grid gap-2">
+        <a href="/profile" class="btn btn-outline-primary">👤 Profile</a>
+        <a href="/logout" class="btn btn-outline-danger">🔓 Logout</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-container">
+  <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" data-bs-delay="3000">
+    <div class="d-flex">
+      <div class="toast-body">✅ Action successful!</div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+  <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert" data-bs-delay="3000">
+    <div class="d-flex">
+      <div class="toast-body">❌ Something went wrong.</div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- AJAX Scripts -->
+<script>
+function showToast(id, message) {
+  const toastEl = document.getElementById(id);
+  toastEl.querySelector('.toast-body').textContent = message;
+  new bootstrap.Toast(toastEl).show();
+}
+
+function loadAdminComplaints() {
+  fetch('/get_complaints_ajax')
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById("adminComplaintsBody");
+      tbody.innerHTML = "";
+      data.complaints.forEach(c => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${c.ComplaintID}</td>
+            <td>${c.UserName}</td>
+            <td>${c.Title}</td>
+            <td>${c.DepartmentName}</td>
+            <td>${c.Priority}</td>
+            <td>${c.StatusName}</td>
+            <td><a href="/view_complaint/${c.ComplaintID}" class="btn btn-sm btn-info">View</a></td>
+          </tr>`;
+      });
+    });
+}
+
+function loadAdminUsers() {
+  fetch('/get_users_ajax')
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById("adminUsersBody");
+      tbody.innerHTML = "";
+      data.users.forEach(u => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${u.UserID}</td>
+            <td>${u.Name}</td>
+            <td>${u.Email}</td>
+            <td>
+              <select onchange="changeRoleDropdown(${u.UserID}, this.value)" class="form-select form-select-sm">
+                <option value="Student" ${u.Role === "Student" ? "selected" : ""}>Student</option>
+                <option value="Admin" ${u.Role === "Admin" ? "selected" : ""}>Admin</option>
+              </select>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.UserID})">Delete</button>
+            </td>
+          </tr>`;
+      });
+    });
+}
+
+function changeRoleDropdown(userId, newRole) {
+  fetch(`/change_role_ajax/${userId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ role: newRole })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      showToast("successToast", data.message);
+    } else {
+      showToast("errorToast", data.message);
+    }
+  });
+}
+
+
+function changeRole(userId) {
+  const confirmChange = confirm("Are you sure you want to change this user's role?");
+  if (!confirmChange) return;
+
+  fetch(`/change_role_ajax/${userId}`, {
+    method: 'POST'
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      showToast("successToast", data.message);
+      loadAdminUsers();  // refresh table
+    } else {
+      showToast("errorToast", data.message);
+    }
+  });
+}
+
+function deleteUser(userId) {
+  if (!confirm("Are you sure you want to delete this user?")) return;
+  fetch(`/delete_user/${userId}`)
+    .then(res => res.text())
+    .then(() => {
+      showToast("successToast", "User deleted.");
+      loadAdminUsers();
+    });
+}
+
+// Load data on page load
+window.onload = () => {
+  loadAdminComplaints();
+  loadAdminUsers();
+};
+</script>
+
+</body>
+</html>

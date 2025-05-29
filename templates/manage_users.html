@@ -1,0 +1,39 @@
+<table class="table mt-5 container">
+  <thead>
+    <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+    {% for u in users %}
+    <tr>
+      <td>{{ u.UserID }}</td>
+      <td>{{ u.Name }}</td>
+      <td>{{ u.Email }}</td>
+      <td>{{ u.Role }}</td>
+      <td>
+        <a href="/delete_user/{{ u.UserID }}" class="btn btn-danger btn-sm">Delete</a>
+        <a href="/change_role/{{ u.UserID }}" class="btn btn-warning btn-sm">Change Role</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<script>
+
+function changeRole(userId) {
+  const confirmChange = confirm("Are you sure you want to change this user's role?");
+  if (!confirmChange) return;
+
+  fetch(`/change_role_ajax/${userId}`, {
+    method: 'POST'
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      showToast("successToast", data.message);
+      loadAdminUsers();  // refresh table
+    } else {
+      showToast("errorToast", data.message);
+    }
+  });
+}
+</script>
