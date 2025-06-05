@@ -1,7 +1,37 @@
+<div align="center">
+
 # Smart Complaint Redressal System
+
+![last-commit](https://img.shields.io/github/last-commit/Gushtasp47/Complaint-Redressal-System?style=flat&logo=git&logoColor=white&color=0080ff)
+![repo-top-language](https://img.shields.io/github/languages/top/Gushtasp47/Complaint-Redressal-System?style=flat&color=0080ff)
+![repo-language-count](https://img.shields.io/github/languages/count/Gushtasp47/Complaint-Redressal-System?style=flat&color=0080ff)
+
+**Built with:**
+
+![Python](https://img.shields.io/badge/Python-3776AB.svg?style=flat&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000.svg?style=flat&logo=flask&logoColor=white)
+![SQL%20Server](https://img.shields.io/badge/SQL%20Server-CC2927.svg?style=flat&logo=microsoftsqlserver&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C.svg?style=flat&logo=bootstrap&logoColor=white)
+
 
 A web-based complaint management platform developed as part of a semester project for Database Management Systems (DBMS). The system allows students to submit complaints and administrators to manage and escalate them efficiently.
 
+</div>
+
+## 📑 Table of Contents
+
+- [Project Description](#project-description)
+- [Tech Stack](#tech-stack)
+- [Key Features](#key-features)
+- [Project Structure](#project-structure)
+- [Database Schema Overview](#database-schema-overview)
+- [Access Control](#access-control)
+- [How to Run](#how-to-run)
+- [Demo Video](#demo-video)
+- [Credits](#author)
+
+
+---
 ## Project Description
 
 This project aims to streamline complaint submission and redressal in an institutional setting through a secure, scalable, and user-friendly web application. It supports role-based access for both **students** and **admins**, ensuring appropriate privileges across the platform.
@@ -91,6 +121,7 @@ project/
 Feel free to fork, contribute, or raise issues. This project was created with learning, collaboration, and real-world relevance in mind.
 
 ---
+## Author
 
 **Author:** Shehzada Gushtasp Khan & Muhammad Dayyan Qazi  
 **Course:** Database Management Systems  
